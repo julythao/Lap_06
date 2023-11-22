@@ -1,1 +1,255 @@
+#include <iostream>
+using namespace std;
 
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+};
+
+Node* taoNode(int giaTri) {
+    Node* newNode = new Node();
+    newNode->data = giaTri;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+Node* chenNode(Node* root, int giaTri) {
+    if (root == NULL) {
+        return taoNode(giaTri);
+    }
+
+    if (giaTri < root->data) {
+        root->left = chenNode(root->left, giaTri);
+    } else if (giaTri > root->data) {
+        root->right = chenNode(root->right, giaTri);
+    }
+
+    return root;
+}
+
+void duyetTruoc(Node* root) {
+    if (root != NULL) {
+        cout << root->data << " ";
+        duyetTruoc(root->left);
+        duyetTruoc(root->right);
+    }
+}
+
+void duyetGiua(Node* root) {
+    if (root != NULL) {
+        duyetGiua(root->left);
+        cout << root->data << " ";
+        duyetGiua(root->right);
+    }
+}
+
+void duyetSau(Node* root) {
+    if (root != NULL) {
+        duyetSau(root->left);
+        duyetSau(root->right);
+        cout << root->data << " ";
+    }
+}
+
+Node* timMin(Node* root) {
+    if (root == NULL) {
+        return NULL;
+    } else if (root->left == NULL) {
+        return root;
+    } else {
+        return timMin(root->left);
+    }
+}
+
+Node* timMax(Node* root) {
+    if (root == NULL) {
+        return NULL;
+    } else if (root->right == NULL) {
+        return root;
+    } else {
+        return timMax(root->right);
+    }
+}
+
+Node* timNode(Node* root, int giaTri) {
+    if (root == NULL || root->data == giaTri) {
+        return root;
+    }
+
+    if (giaTri < root->data) {
+        return timNode(root->left, giaTri);
+    } else {
+        return timNode(root->right, giaTri);
+    }
+}
+
+int demSoNode(Node* root) {
+    if (root == NULL) {
+        return 0;
+    } else {
+        return demSoNode(root->left) + demSoNode(root->right) + 1;
+    }
+}
+
+int demSoNodeTrong(Node* root) {
+    if (root == NULL || (root->left == NULL && root->right == NULL)) {
+        return 0;
+    } else {
+        return demSoNodeTrong(root->left) + demSoNodeTrong(root->right) + 1;
+    }
+}
+
+int tinhChieuCao(Node* root) {
+    if (root == NULL) {
+        return -1;
+    } else {
+        int chieuCaoTrai = tinhChieuCao(root->left);
+        int chieuCaoPhai = tinhChieuCao(root->right);
+        return max(chieuCaoTrai, chieuCaoPhai) + 1;
+    }
+}
+
+Node* xoaNode(Node* root, int giaTri) {
+    if (root == NULL) {
+        return root;
+    }
+
+    if (giaTri < root->data) {
+        root->left = xoaNode(root->left, giaTri);
+    } else if (giaTri > root->data) {
+        root->right = xoaNode(root->right, giaTri);
+    } else {
+        if (root->left == NULL) {
+            Node* temp = root->right;
+            delete root;
+            return temp;
+        } else if (root->right == NULL) {
+            Node* temp = root->left;
+            delete root;
+            return temp;
+        }
+
+        Node* nodeNhoNhat = timMin(root->right);
+        root->data = nodeNhoNhat->data;
+        root->right = xoaNode(root->right, nodeNhoNhat->data);
+    }
+
+    return root;
+}
+
+void hienThiMenu() {
+    cout << "-------------------- Menu --------------------" << endl;
+    cout << "1. Chen mot node" << endl;
+    cout << "2. Duyet cay theo thu tu truoc (pre-order)" << endl;
+    cout << "3. Duyet cay theo thu tu giua (in-order)" << endl;
+    cout << "4. Duyet cay theo thu tu sau (post-order)" << endl;
+    cout << "5. Tim gia tri nho nhat" << endl;
+    cout << "6. Tim gia tri lon nhat" << endl;
+    cout << "7. Tim mot gia tri" << endl;
+    cout << "8. Dem so node" << endl;
+    cout << "9. Dem so node trong" << endl;
+    cout << "10. Tinh chieu cao cua cay" << endl;
+    cout << "11. Xoa mot node" << endl;
+    cout << "12. Thoat" << endl;
+    cout << "----------------------------------------------" << endl;
+}
+
+int main() {
+    Node* root = NULL;
+    int luaChon, giaTri;
+
+    root = chenNode(root, 8);
+    root = chenNode(root, 3);
+    root = chenNode(root, 10);
+    root = chenNode(root, 1);
+    root = chenNode(root, 6);
+    root = chenNode(root, 4);
+    root = chenNode(root, 7);
+    root = chenNode(root, 9);
+    root = chenNode(root, 14);
+    root = chenNode(root, 13);
+
+    do {
+        hienThiMenu();
+        cout << "Nhap lua chon cua ban: ";
+        cin >> luaChon;
+
+        switch (luaChon) {
+            case 1:
+                cout << "Nhap gia tri can chen: ";
+                cin >> giaTri;
+                root = chenNode(root, giaTri);
+                cout << "Chen node thanh cong." << endl;
+                break;
+            case 2:
+                cout << "Duyet cay theo thu tu truoc: ";
+                duyetTruoc(root);
+                cout << endl;
+                break;
+            case 3:
+                cout << "Duyet cay theo thu tu giua: ";
+                duyetGiua(root);
+                cout << endl;
+                break;
+            case 4:
+                cout << "Duyet cay theo thu tu sau: ";
+                duyetSau(root);
+                cout << endl;
+                break;
+            case 5: {
+                Node* nodeNhoNhat = timMin(root);
+                if (nodeNhoNhat != NULL) {
+                    cout << "Gia tri nho nhat: " << nodeNhoNhat->data << endl;
+                } else {
+                    cout << "Cay rong." << endl;
+                }
+                break;
+            }
+            case 6: {
+                Node* nodeLonNhat = timMax(root);
+                if (nodeLonNhat != NULL) {
+                    cout << "Gia tri lon nhat: " << nodeLonNhat->data << endl;
+                } else {
+                    cout << "Cay rong." << endl;
+                }
+                break;
+            }
+            case 7:
+                cout << "Nhap gia tri can tim: ";
+                cin >> giaTri;
+                if (timNode(root, giaTri) != NULL) {
+                    cout << "Gia tri " << giaTri << " duoc tim thay trong cay." << endl;
+                } else {
+                    cout << "Gia tri " << giaTri << " khong duoc tim thay trong cay." << endl;
+                }
+                break;
+            case 8:
+                cout << "So luong node trong cay: " << demSoNode(root) << endl;
+                break;
+            case 9:
+                cout << "So luong node trong cay (khong tinh node la): " << demSoNodeTrong(root) << endl;
+                break;
+            case 10:
+                cout << "Chieu cao cua cay: " << tinhChieuCao(root) << endl;
+                break;
+            case 11:
+                cout << "Nhap gia tri can xoa: ";
+                cin >> giaTri;
+                root = xoaNode(root, giaTri);
+                cout << "Xoa node thanh cong." << endl;
+                break;
+            case 12:
+                break;
+            default:
+                cout << "Lua chon khong hop le. Vui long thu lai." << endl;
+                break;
+        }
+
+        cout << endl;
+
+    } while (luaChon != 12);
+
+    return 0;
+}
